@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { User, LogOut, Image, Video, Send, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { User, LogOut, Image, Video, Send, X, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import suitcaseDimensions from "@/assets/suitcase-dimensions.jpg";
 import suitcasePacked from "@/assets/suitcase-packed.jpg";
 
 const galleryImages = [
-  { src: suitcaseDimensions, caption: "Valigia chiusa e aperta — dimensioni" },
-  { src: suitcasePacked, caption: "Valigia aperta con outfit estivo" },
+  { id: "dim", src: suitcaseDimensions, caption: "Valigia — dimensioni" },
+  { id: "pack", src: suitcasePacked, caption: "Outfit estivo" },
 ];
 
 const Home = () => {
@@ -16,7 +16,25 @@ const Home = () => {
   const username = (location.state as { username?: string })?.username || "Utente";
   const [message, setMessage] = useState("");
   const [galleryOpen, setGalleryOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+
+  const toggleImage = (id: string) => {
+    setSelectedImages((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const confirmSelection = () => {
+    setGalleryOpen(false);
+  };
+
+  const handleSend = () => {
+    // "Send" the message / photos — then clear everything
+    setMessage("");
+    setSelectedImages([]);
+  };
+
+  const hasContent = message.trim().length > 0 || selectedImages.length > 0;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -66,32 +84,48 @@ const Home = () => {
           >
             <div className="animate-orb-breathe flex flex-col items-center gap-2">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                <svg
-                  viewBox="0 0 24 24"
-                  className="h-6 w-6 text-primary"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                <svg viewBox="0 0 24 24" className="h-6 w-6 text-primary" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                 </svg>
               </div>
-              <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground transition-colors">
-                Clicca per parlare
-              </span>
-              <span className="text-xs text-muted-foreground/60">
-                con me
-              </span>
+              <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground transition-colors">Clicca per parlare</span>
+              <span className="text-xs text-muted-foreground/60">con me</span>
             </div>
           </button>
-
-          {/* Decorative rings */}
           <div className="pointer-events-none absolute inset-0 -m-4 rounded-full border border-primary/10" />
           <div className="pointer-events-none absolute inset-0 -m-10 rounded-full border border-primary/5" />
         </motion.div>
       </main>
+
+      {/* Selected images preview above input bar */}
+      <AnimatePresence>
+        {selectedImages.length > 0 && !galleryOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="border-t border-border bg-secondary/30 px-4 py-2"
+          >
+            <div className="mx-auto flex max-w-lg gap-2 overflow-x-auto">
+              {selectedImages.map((id) => {
+                const img = galleryImages.find((g) => g.id === id);
+                if (!img) return null;
+                return (
+                  <div key={id} className="relative shrink-0">
+                    <img src={img.src} alt={img.caption} className="h-16 w-16 rounded-lg object-cover" />
+                    <button
+                      onClick={() => setSelectedImages((p) => p.filter((i) => i !== id))}
+                      className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-background"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Bottom Input Bar */}
       <motion.div
@@ -103,7 +137,7 @@ const Home = () => {
         <div className="mx-auto flex max-w-lg items-center gap-2">
           <button
             type="button"
-            onClick={() => { setActiveIndex(0); setGalleryOpen(true); }}
+            onClick={() => setGalleryOpen(true)}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             aria-label="Aggiungi foto"
           >
@@ -125,7 +159,8 @@ const Home = () => {
           />
           <button
             type="button"
-            disabled={!message.trim()}
+            disabled={!hasContent}
+            onClick={handleSend}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:opacity-30 hover:opacity-90 active:scale-95"
             aria-label="Invia"
           >
@@ -134,66 +169,71 @@ const Home = () => {
         </div>
       </motion.div>
 
-      {/* Gallery Modal */}
+      {/* Gallery — phone-style grid */}
       <AnimatePresence>
         {galleryOpen && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex flex-col bg-foreground/95"
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", damping: 28, stiffness: 300 }}
+            className="fixed inset-0 z-50 flex flex-col bg-background"
           >
-            {/* Gallery Header */}
-            <div className="flex items-center justify-between px-4 py-3">
-              <span className="text-sm font-medium text-background/80">
-                {activeIndex + 1} / {galleryImages.length}
-              </span>
+            {/* Gallery header */}
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
               <button
-                onClick={() => setGalleryOpen(false)}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-background/70 transition-colors hover:text-background"
+                onClick={() => { setGalleryOpen(false); setSelectedImages([]); }}
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
-                <X size={22} />
+                Annulla
+              </button>
+              <span className="text-sm font-semibold text-foreground">Galleria</span>
+              <button
+                onClick={confirmSelection}
+                disabled={selectedImages.length === 0}
+                className="text-sm font-semibold text-primary disabled:opacity-30"
+              >
+                Fatto {selectedImages.length > 0 && `(${selectedImages.length})`}
               </button>
             </div>
 
-            {/* Image */}
-            <div className="relative flex flex-1 items-center justify-center px-4">
-              <AnimatePresence mode="wait">
-                <motion.img
-                  key={activeIndex}
-                  src={galleryImages[activeIndex].src}
-                  alt={galleryImages[activeIndex].caption}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                  className="max-h-[70vh] max-w-full rounded-xl object-contain"
-                />
-              </AnimatePresence>
-
-              {/* Nav arrows */}
-              {activeIndex > 0 && (
-                <button
-                  onClick={() => setActiveIndex(activeIndex - 1)}
-                  className="absolute left-2 flex h-10 w-10 items-center justify-center rounded-full bg-background/10 text-background backdrop-blur-sm transition-colors hover:bg-background/20"
-                >
-                  <ChevronLeft size={20} />
-                </button>
-              )}
-              {activeIndex < galleryImages.length - 1 && (
-                <button
-                  onClick={() => setActiveIndex(activeIndex + 1)}
-                  className="absolute right-2 flex h-10 w-10 items-center justify-center rounded-full bg-background/10 text-background backdrop-blur-sm transition-colors hover:bg-background/20"
-                >
-                  <ChevronRight size={20} />
-                </button>
-              )}
+            {/* Grid */}
+            <div className="flex-1 overflow-y-auto p-1">
+              <div className="grid grid-cols-3 gap-1">
+                {galleryImages.map((img) => {
+                  const isSelected = selectedImages.includes(img.id);
+                  return (
+                    <button
+                      key={img.id}
+                      onClick={() => toggleImage(img.id)}
+                      className="relative aspect-square overflow-hidden"
+                    >
+                      <img
+                        src={img.src}
+                        alt={img.caption}
+                        className="h-full w-full object-cover transition-transform duration-150 active:scale-95"
+                      />
+                      {/* Selection overlay */}
+                      <div
+                        className={`absolute inset-0 transition-colors duration-150 ${
+                          isSelected ? "bg-primary/20" : "bg-transparent"
+                        }`}
+                      />
+                      {/* Checkbox circle */}
+                      <div
+                        className={`absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full border-2 transition-all duration-150 ${
+                          isSelected
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-background/80 bg-foreground/20"
+                        }`}
+                      >
+                        {isSelected && <Check size={14} />}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-
-            {/* Caption */}
-            <p className="px-4 pb-6 pt-3 text-center text-sm text-background/70">
-              {galleryImages[activeIndex].caption}
-            </p>
           </motion.div>
         )}
       </AnimatePresence>
