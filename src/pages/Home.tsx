@@ -1,13 +1,22 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { User, LogOut, Image, Video, Send } from "lucide-react";
-import { motion } from "framer-motion";
+import { User, LogOut, Image, Video, Send, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import suitcaseDimensions from "@/assets/suitcase-dimensions.jpg";
+import suitcasePacked from "@/assets/suitcase-packed.jpg";
+
+const galleryImages = [
+  { src: suitcaseDimensions, caption: "Valigia chiusa e aperta — dimensioni" },
+  { src: suitcasePacked, caption: "Valigia aperta con outfit estivo" },
+];
 
 const Home = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const username = (location.state as { username?: string })?.username || "Utente";
   const [message, setMessage] = useState("");
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -94,6 +103,7 @@ const Home = () => {
         <div className="mx-auto flex max-w-lg items-center gap-2">
           <button
             type="button"
+            onClick={() => { setActiveIndex(0); setGalleryOpen(true); }}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             aria-label="Aggiungi foto"
           >
@@ -123,6 +133,70 @@ const Home = () => {
           </button>
         </div>
       </motion.div>
+
+      {/* Gallery Modal */}
+      <AnimatePresence>
+        {galleryOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex flex-col bg-foreground/95"
+          >
+            {/* Gallery Header */}
+            <div className="flex items-center justify-between px-4 py-3">
+              <span className="text-sm font-medium text-background/80">
+                {activeIndex + 1} / {galleryImages.length}
+              </span>
+              <button
+                onClick={() => setGalleryOpen(false)}
+                className="flex h-9 w-9 items-center justify-center rounded-full text-background/70 transition-colors hover:text-background"
+              >
+                <X size={22} />
+              </button>
+            </div>
+
+            {/* Image */}
+            <div className="relative flex flex-1 items-center justify-center px-4">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={activeIndex}
+                  src={galleryImages[activeIndex].src}
+                  alt={galleryImages[activeIndex].caption}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  className="max-h-[70vh] max-w-full rounded-xl object-contain"
+                />
+              </AnimatePresence>
+
+              {/* Nav arrows */}
+              {activeIndex > 0 && (
+                <button
+                  onClick={() => setActiveIndex(activeIndex - 1)}
+                  className="absolute left-2 flex h-10 w-10 items-center justify-center rounded-full bg-background/10 text-background backdrop-blur-sm transition-colors hover:bg-background/20"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+              )}
+              {activeIndex < galleryImages.length - 1 && (
+                <button
+                  onClick={() => setActiveIndex(activeIndex + 1)}
+                  className="absolute right-2 flex h-10 w-10 items-center justify-center rounded-full bg-background/10 text-background backdrop-blur-sm transition-colors hover:bg-background/20"
+                >
+                  <ChevronRight size={20} />
+                </button>
+              )}
+            </div>
+
+            {/* Caption */}
+            <p className="px-4 pb-6 pt-3 text-center text-sm text-background/70">
+              {galleryImages[activeIndex].caption}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
