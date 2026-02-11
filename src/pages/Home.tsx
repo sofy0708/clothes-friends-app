@@ -1,11 +1,13 @@
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { User, LogOut } from "lucide-react";
+import { User, LogOut, Image, Video, Send } from "lucide-react";
 import { motion } from "framer-motion";
 
 const Home = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const username = (location.state as { username?: string })?.username || "Utente";
+  const [message, setMessage] = useState("");
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -51,9 +53,7 @@ const Home = () => {
         >
           <button
             className="animate-orb-pulse group relative flex h-52 w-52 items-center justify-center rounded-full border-2 border-primary/30 bg-background transition-all duration-300 hover:border-primary hover:shadow-lg active:scale-95"
-            onClick={() => {
-              // Future: open chat/interaction
-            }}
+            onClick={() => {}}
           >
             <div className="animate-orb-breathe flex flex-col items-center gap-2">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
@@ -83,6 +83,46 @@ const Home = () => {
           <div className="pointer-events-none absolute inset-0 -m-10 rounded-full border border-primary/5" />
         </motion.div>
       </main>
+
+      {/* Bottom Input Bar */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+        className="border-t border-border bg-background px-4 py-3"
+      >
+        <div className="mx-auto flex max-w-lg items-center gap-2">
+          <button
+            type="button"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            aria-label="Aggiungi foto"
+          >
+            <Image size={20} />
+          </button>
+          <button
+            type="button"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            aria-label="Videochiamata"
+          >
+            <Video size={20} />
+          </button>
+          <input
+            type="text"
+            placeholder="Scrivi un messaggio..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            className="flex-1 rounded-full border border-input bg-secondary/50 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          />
+          <button
+            type="button"
+            disabled={!message.trim()}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:opacity-30 hover:opacity-90 active:scale-95"
+            aria-label="Invia"
+          >
+            <Send size={18} />
+          </button>
+        </div>
+      </motion.div>
     </div>
   );
 };
