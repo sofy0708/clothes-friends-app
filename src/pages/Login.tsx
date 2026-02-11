@@ -30,7 +30,7 @@ const Login = () => {
             <span className="text-primary">Friends</span>
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Il tuo guardaroba condiviso
+            Pack like a Pro. Even if you're not
           </p>
         </div>
 
