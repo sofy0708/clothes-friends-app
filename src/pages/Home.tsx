@@ -83,6 +83,14 @@ const Home = () => {
           Clothes<span className="text-primary">Friends</span>
         </h2>
         <div className="flex items-center gap-3">
+          {/* Logout */}
+          <button
+            onClick={() => navigate("/")}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-input text-muted-foreground transition-colors hover:bg-secondary"
+            aria-label="Logout"
+          >
+            <LogOut size={16} />
+          </button>
           {/* Wardrobe icon */}
           <button
             onClick={() => setWardrobeOpen(true)}
@@ -103,14 +111,6 @@ const Home = () => {
             aria-label="Carta di credito"
           >
             <CreditCard size={16} />
-          </button>
-          {/* Logout */}
-          <button
-            onClick={() => navigate("/")}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-input text-muted-foreground transition-colors hover:bg-secondary"
-            aria-label="Logout"
-          >
-            <LogOut size={16} />
           </button>
           {/* Profile */}
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-foreground text-background">
