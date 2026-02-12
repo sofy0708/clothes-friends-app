@@ -11,7 +11,7 @@ const Register = () => {
   const handleComplete = (e: React.FormEvent) => {
     e.preventDefault();
     if (!username.trim()) return;
-    navigate("/home", { state: { username: username.trim() } });
+    navigate("/profile-setup", { state: { username: username.trim() } });
   };
 
   return (
@@ -70,7 +70,7 @@ const Register = () => {
             whileTap={{ scale: 0.97 }}
             className="w-full rounded-xl bg-foreground py-3.5 text-sm font-semibold text-background transition-opacity hover:opacity-90"
           >
-            Concludi
+            Avanti
           </motion.button>
         </form>
 

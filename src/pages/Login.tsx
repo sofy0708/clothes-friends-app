@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
+import logo from "@/assets/logo.png";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -11,7 +12,6 @@ const Login = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // For MVP, navigate directly to home with a default name
     navigate("/home", { state: { username: "Utente" } });
   };
 
@@ -24,14 +24,13 @@ const Login = () => {
         className="w-full max-w-sm"
       >
         {/* Logo */}
-        <div className="mb-12 text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            Clothes
-            <span className="text-primary">Friends</span>
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Pack like a Pro. Even if you're not
-          </p>
+        <div className="mb-12 flex justify-center">
+          <img
+            src={logo}
+            alt="ClothesFriends"
+            className="h-32 w-auto object-contain"
+            style={{ mixBlendMode: "multiply" }}
+          />
         </div>
 
         {/* Form */}
