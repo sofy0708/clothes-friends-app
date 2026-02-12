@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, Calendar } from "lucide-react";
 import { motion } from "framer-motion";
+import logo from "@/assets/logo.png";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -23,11 +24,8 @@ const Register = () => {
         className="w-full max-w-sm"
       >
         {/* Header */}
-        <div className="mb-12 text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            Clothes
-            <span className="text-primary">Friends</span>
-          </h1>
+        <div className="mb-12 flex flex-col items-center">
+          <img src={logo} alt="ClothesFriends" className="h-28 w-auto object-contain" style={{ mixBlendMode: "multiply" }} />
           <p className="mt-2 text-sm text-muted-foreground">
             Crea il tuo profilo
           </p>
