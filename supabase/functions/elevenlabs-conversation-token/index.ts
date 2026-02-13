@@ -5,7 +5,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-const AGENT_ID = "agent_8101kh78nsyhfb4vf1bcr4ekd97y";
+const AGENT_ID = "agent_1701kh6kpex2f1dvd7g34r0r0y9b";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
