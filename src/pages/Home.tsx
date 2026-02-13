@@ -58,7 +58,7 @@ const Home = () => {
       await navigator.mediaDevices.getUserMedia({ audio: true });
 
       await conversation.startSession({
-        agentId: "agent_1701kh6kpex2f1dvd7g34r0r0y9b",
+        agentId: "agent_2201khaxdpgye5arn7tyd78j16y5",
         connectionType: "webrtc",
       });
     } catch (error) {
