@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { User, LogOut, Image, Video, Send, X, Check, CreditCard, Crown, MessageSquare, Calendar, Settings } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useConversation } from "@elevenlabs/react";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.png";
 import suitcaseDimensions from "@/assets/suitcase-dimensions.jpg";
 import suitcasePacked from "@/assets/suitcase-packed.jpg";
@@ -55,8 +56,15 @@ const Home = () => {
   const startConversation = useCallback(async () => {
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      // Get authenticated token from edge function
+      const { data, error } = await supabase.functions.invoke("elevenlabs-conversation-token");
+      if (error || !data?.token) {
+        throw new Error(error?.message || "No token received");
+      }
+
       await conversation.startSession({
-        agentId: "agent_8101kh78nsyhfb4vf1bcr4ekd97y",
+        conversationToken: data.token,
         connectionType: "webrtc",
       });
     } catch (error) {
